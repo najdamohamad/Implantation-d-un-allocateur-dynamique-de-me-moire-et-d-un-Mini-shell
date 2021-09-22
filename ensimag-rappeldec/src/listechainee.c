@@ -61,54 +61,40 @@ struct elem *creation_liste(long unsigned int *valeurs, size_t nb_elems) {
 
 /* Libère toute la mémoire associée à la liste passée en paramètre. */
 void destruction_liste(struct elem *liste) {
-    struct elem* p=liste;
-    while(!(p->next==NULL)){
-      liste=p->next;
+
+    while(liste!=NULL){
+      struct elem* p=liste;
+      liste=liste->next;
       free(p);
     }
-    free(p);
 }
 
 
-/* Inverse la liste simplement chainée passée en paramètre. Le
- * paramètre liste contient l'adresse du pointeur sur la tête de liste
- * à inverser. */
-// void inversion_liste(struct elem **liste) {
-//     struct elem* precedent;
-//     struct elem* courant;
-//     struct elem* suivant;
-//     courant=*liste;
-//     suivant=(*liste)->next;
-//     courant->next=NULL;
-//     while(suivant->next!=NULL){
-//       precedent=courant;
-//       courant=suivant;
-//       suivant=courant->next;
-//
-//       courant->next=precedent;
-//
-//     }
-//     suivant->next=courant;
-//     *liste=suivant;
-// }
 
-void inversion_liste(struct elem **liste1){
-  struct elem *p1=*liste1;
-  struct elem *p2=calloc(1,sizeof(struct elem*));
-  struct elem *abrancher=calloc(1,sizeof(struct elem*));
+void inversion(struct elem** pl){
 
-  p2->val=p1->val;
-  p2->next=NULL;
-  p1=p1->next;
+  int i=0;
 
-  while(p1->next!=NULL){
-    abrancher->next=p2;
-    abrancher->val=p1->val;
-    p1=p1->next;
-    p2=abrancher;
+  struct elem* l=*pl;
+  struct elem** pcopie=malloc(sizeof(struct elem*));
+  *pcopie=NULL;
+  while(l!=NULL){
+    struct elem* cel=malloc(sizeof(struct elem));
+    cel->val=l->val;
+    cel->next=*pcopie;
+    *pcopie=cel;
+    struct elem* sup=l;
+    l=l->next;
+
+    printf("%d\n",i++);
+    printf("%lu\n",(*pcopie)->val);
+    printf("%p",pcopie);
+    printf("\n\n");
+
+    free(sup);
   }
-
-  *liste1=p2;
+  *pl=*pcopie;
+  //free(*pl);
 }
 
 const long unsigned int TAILLE = 100;
@@ -123,8 +109,6 @@ int main(void)
     e1.next = &e2;
     e2.next = &e3;
     e3.next = NULL;
-
-    getchar();
 
     affichage_liste(&e1);
 
@@ -153,9 +137,17 @@ int main(void)
     getchar();
 
     affichage_liste(tab_elem);
-    inversion_liste(&tab_elem);
+
+    getchar();
+
+    inversion (&tab_elem);
     assert(tab_elem != NULL);
     printf("Liste inversée:\n");
+
+    getchar();
+    // PB ici, la fonction d'inversion boucle en continue sur l'avant dernier element de la liste non inversée: sur la condition initiale ou final, a verifier
+
+
     affichage_liste(tab_elem);
 
     /* Vérifie que la liste est inversée et complète */
@@ -167,6 +159,9 @@ int main(void)
     /* Pour tester le bon fonctionnement de la fonction suivante, on
      * lancera valgrind sur le programme pour vérifier qu'aucune fuite
      * mémoire n'est présente. */
+
+    getchar();
+
     destruction_liste(tab_elem);
 
     return EXIT_SUCCESS;

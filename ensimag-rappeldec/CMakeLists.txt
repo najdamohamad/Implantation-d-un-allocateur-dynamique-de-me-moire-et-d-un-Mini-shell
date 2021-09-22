@@ -17,7 +17,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wconversion -
 # inutile pour le rappel de C, mais vous ferez la même chose pour
 # l'examen
 #########
-set(LOGINS login1)
+set(LOGINS teissico)
 
 if (LOGINS MATCHES "login1")
   message(FATAL_ERROR "** ERREUR / ERROR **: Vous devez modifier CMakeLists.txt pour remplacer login1 par votre login / Substitute login1 with your own login in CMakeLists.txt")
