@@ -28,5 +28,7 @@ emalloc_small(unsigned long size)
 }
 
 void efree_small(Alloc a) {
-    /* ecrire votre code ici */
+    void* precedent=arena.chunkpool;
+    arena.chunkpool=a.ptr;
+    *(arena.chunkpool)=precedent;
 }
