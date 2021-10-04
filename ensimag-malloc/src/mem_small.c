@@ -11,10 +11,24 @@
 void *
 emalloc_small(unsigned long size)
 {
-    /* ecrire votre code ici */
-    return (void *)0;
+  assert(size>64*sizeof(uint8_t));
+  if(arena.chunkpool==NULL){
+    unsigned long mem_realloc=mem_realloc_small();
+    int nb_chunk=mem_realloc/96;
+    for(int i=0;i<nb_chunk;i++){
+      *(arena.chunkpool+i*96*sizeof(uint8_t))=arena.chunkpool+(i+1)*96*sizeof(uint8_t);
+    }
+    *(arena.chunkpool+nb_chunk*96*sizeof(uint8_t)=NULL;
+
+  }
+    void* ptr=arena.chunkpool;
+    arena.chunkpool=arena.chunkpool+96*sizeof(uint8_t);
+    void* mark=mark_memarea_and_get_user_ptr(ptr,CHUNKSIZE,SMALL_KIND);
+    return(mark);
 }
 
 void efree_small(Alloc a) {
-    /* ecrire votre code ici */
+    void* precedent=arena.chunkpool;
+    arena.chunkpool=a.ptr;
+    *(arena.chunkpool)=precedent;
 }
