@@ -27,13 +27,50 @@ emalloc_medium(unsigned long size)
 {
     assert(size < LARGEALLOC);
     assert(size > SMALLALLOC);
-    /* ecrire votre code ici */
-    return (void *) 0;
+    unsigned int indice=puiss2(size);
+    unsigned int courant=indice;
+    while((arena.TZL[courant]==NULL) && (courant<TZL_SIZE)){
+      courant++;
+    }
+    if(courant=TZL_SIZE){
+      mem_realloc_medium();
+    }
+    while(courant!=indice){
+      void* decoupe1=arena.TLZ[courant];
+      void* decoupe2=arena.TLZ[courant]+pow(2,courant-1);
+      arena.TLZ[courant]=*decoupe1;
+      *decoupe1=decoupe2;
+      *decoupe2=arena.TLZ[courant-1];
+      arena.TLZ[courant-1]=decoupe1;
+      courant--;
+    }
+    void* mem_alloue=arena.TLZ[indice];
+    arena.TLZ[indice]=*(arena.TLZ[indice]);
+    return (mem_alloue);
 }
+
 
 
 void efree_medium(Alloc a) {
-    /* ecrire votre code ici */
+    unsigned int indice=puiss2(size);
+    void* adresse_budy=a.ptr^((uint64_t)*pow(2,indice));
+    void* ptr_courant=arena.TLZ[indice];
+    while(1){
+      if(ptr_courant==adresse_budy){
+        *(adresse_budy-pow(2,indice))=NULL;
+        a.size=2*a.size;
+        indice++;
+        adresse_budy=a.ptr^((uint64_t)*pow(2,indice));
+        ptr_courant=arena.TLZ[indice];
+      }
+      else{
+        ptr_courant=*ptr_courant;
+        if(ptr_courant==NULL){
+          *(a.ptr)=arena.TLZ[indice];
+          arena.TLZ[indice]=a.ptr;
+          break;
+        }
+      }
+    }
+
 }
-
-
