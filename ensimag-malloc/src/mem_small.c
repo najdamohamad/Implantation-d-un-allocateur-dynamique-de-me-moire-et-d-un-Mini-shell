@@ -5,6 +5,7 @@
  ******************************************************/
 
 #include <assert.h>
+#include <stdint.h>
 #include "mem.h"
 #include "mem_internals.h"
 
@@ -12,13 +13,16 @@ void *
 emalloc_small(unsigned long size)
 {
   assert(size>64*sizeof(uint8_t));
+  uint64_t** ptr_courant;
   if(arena.chunkpool==NULL){
     unsigned long mem_realloc=mem_realloc_small();
     int nb_chunk=mem_realloc/96;
     for(int i=0;i<nb_chunk;i++){
-      *(arena.chunkpool+i*96*sizeof(uint8_t))=arena.chunkpool+(i+1)*96*sizeof(uint8_t);
+      ptr_courant=arena.chunkpool+i*96*sizeof(uint8_t);
+      *ptr_courant=arena.chunkpool+(i+1)*96*sizeof(uint8_t);
     }
-    *(arena.chunkpool+nb_chunk*96*sizeof(uint8_t)=NULL;
+    ptr_courant=arena.chunkpool+nb_chunk*96*sizeof(uint8_t);
+    *ptr_courant=NULL;
 
   }
     void* ptr=arena.chunkpool;
@@ -28,7 +32,7 @@ emalloc_small(unsigned long size)
 }
 
 void efree_small(Alloc a) {
-    void* precedent=arena.chunkpool;
+    uint64_t** precedent=arena.chunkpool;
     arena.chunkpool=a.ptr;
-    *(arena.chunkpool)=precedent;
+    *((uint64_t*)a.ptr)=**precedent;
 }

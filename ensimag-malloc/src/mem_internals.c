@@ -18,10 +18,17 @@ unsigned long knuth_mmix_one_round(unsigned long in)
 void *mark_memarea_and_get_user_ptr(void *ptr, unsigned long size, MemKind k)
 {
     uint64_t taille=(uint64_t)size;
-    *ptr=taille;
-    *(ptr+size-0x10)=taille;
 
-    uint64_t magic=(uint64_t)(knuth_mmix_one_round((unsigned long)ptr);
+    uint64_t* ptr_taille1=ptr;
+    uint64_t* ptr_taille2=ptr+size-sizeof(uint64_t);
+
+    uint64_t* ptr_magic1=ptr+sizeof(uint64_t);
+    uint64_t* ptr_magic2=ptr+size-2*sizeof(uint64_t);
+
+    *ptr_taille1=taille;
+    *ptr_taille2=taille;
+
+    uint64_t magic=(uint64_t)(knuth_mmix_one_round((unsigned long)ptr));
     if(size<=96*sizeof(uint8_t)){
       magic=magic | 0x1;
       magic=magic & ~(0x10);
@@ -34,38 +41,42 @@ void *mark_memarea_and_get_user_ptr(void *ptr, unsigned long size, MemKind k)
       magic= magic | 0x11;
     }
 
-    *(ptr+0x8)=magic;
-    *(ptr+size-2*0x10)=magic;
+    *ptr_magic1=magic;
+    *ptr_magic2=magic;
 
-    void* ptr_utilisateur=ptr+size;
+    void* ptr_utilisateur=ptr+2*sizeof(uint64_t);
     return ptr_utilisateur;
 }
 
 Alloc
 mark_check_and_get_alloc(void *ptr)
 {
-    uint64_t taille=*(ptr-2*sizeof(uint64_t));
-    uint64_t magic1=*(ptr-sizeof(uint64_t));
-    uint64_t magic2=*(ptr+taille*sizeof(uint8_t));
+    uint64_t* ptr_taille=ptr-2*sizeof(uint64_t);
+    uint64_t taille=*ptr_taille;
+
+    uint64_t* ptr_magic1=ptr-sizeof(uint64_t);
+    uint64_t* ptr_magic2=ptr+taille*sizeof(uint64_t);
+
+    uint64_t magic1=*ptr_magic1;
+    uint64_t magic2=*ptr_magic2;
 
     assert(magic1==magic2);
 
-    uint64_t kind=magic & 0x111;
+    uint64_t kind=magic1 & 0b11;
 
     Alloc a;
-    a.ptr=ptr-2*sizeof(uint8_t);
+    a.ptr=ptr-2*sizeof(uint64_t);
 
-    uint64_t kind=magic & 0x111;
-    if(kind==0x01){
+    if(kind==0b01){
       a.kind=SMALL_KIND;
     }
-    if(kind==0x10){
+    if(kind==0b10){
       a.kind=MEDIUM_KIND;
     }
-    if(kind==0x11){
+    if(kind==0b11){
       a.kind=LARGE_KIND;
     }
-    
+
     a.size=(unsigned long)taille;
 
     return a;
