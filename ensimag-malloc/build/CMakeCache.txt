@@ -483,7 +483,7 @@ CPACK_BINARY_TXZ-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CPACK_BINARY_TZ
 CPACK_BINARY_TZ-ADVANCED:INTERNAL=1
 //Details about finding PythonInterp
-FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[/usr/bin/python3.8][v3.8.5()]
+FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[/usr/bin/python3.8][v3.8.10()]
 //Details about finding Threads
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 //ADVANCED property for variable: GTEST_INCLUDE_DIR

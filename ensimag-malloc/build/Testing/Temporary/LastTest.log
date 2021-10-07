@@ -1,0 +1,36 @@
+Start testing: Oct 07 13:23 CEST
+----------------------------------------------------------
+1/1 Testing: AllTestsAllocator
+1/1 Test: AllTestsAllocator
+Command: "/home/corentin/Documents/sepc/ensimag-malloc/build/alloctest"
+Directory: /home/corentin/Documents/sepc/ensimag-malloc/build
+"AllTestsAllocator" start time: Oct 07 13:23 CEST
+Output:
+----------------------------------------------------------
+[==========] Running 12 tests from 4 test suites.
+[----------] Global test environment set-up.
+[----------] 1 test from Mark
+[ RUN      ] Mark.mmix
+/home/corentin/Documents/sepc/ensimag-malloc/tests/test_mark.cc:23: Failure
+Expected equality of these values:
+  tab[1]
+    Which is: 1395036129644198697
+  knuth_mmix_one_round((unsigned long)tab) & ~(0b11UL)
+    Which is: 1395036129644198696
+[  FAILED  ] Mark.mmix (0 ms)
+[----------] 1 test from Mark (0 ms total)
+
+[----------] 7 tests from Basic
+[ RUN      ] Basic.zero
+[       OK ] Basic.zero (0 ms)
+[ RUN      ] Basic.onetinysmall
+alloctest: /home/corentin/Documents/sepc/ensimag-malloc/src/mem_small.c:15: emalloc_small: Assertion `size>64*sizeof(uint8_t)' failed.
+<end of output>
+Test time =   0.44 sec
+----------------------------------------------------------
+Test Failed.
+"AllTestsAllocator" end time: Oct 07 13:23 CEST
+"AllTestsAllocator" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 07 13:23 CEST

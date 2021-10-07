@@ -32,42 +32,77 @@ emalloc_medium(unsigned long size)
     while((arena.TZL[courant]==NULL) && (courant<TZL_SIZE)){
       courant++;
     }
-    if(courant=TZL_SIZE){
+    if(courant==TZL_SIZE){
       mem_realloc_medium();
     }
     while(courant!=indice){
-      void* decoupe1=arena.TLZ[courant];
-      void* decoupe2=arena.TLZ[courant]+pow(2,courant-1);
-      arena.TLZ[courant]=*decoupe1;
-      *decoupe1=decoupe2;
-      *decoupe2=arena.TLZ[courant-1];
-      arena.TLZ[courant-1]=decoupe1;
+      uint64_t* decoupe1=arena.TZL[courant];
+
+      int pow=1;
+      for(int i=1;i<=courant-1;i++){
+        pow=pow*2;
+      }
+
+      uint64_t* decoupe2=(uint64_t*)(arena.TZL[courant])+(pow/8);
+      arena.TZL[courant]=(void*)*decoupe1;
+      *decoupe1=(uint64_t)decoupe2;
+      *decoupe2=(uint64_t)arena.TZL[courant-1];
+      arena.TZL[courant-1]=decoupe1;
       courant--;
     }
-    void* mem_alloue=arena.TLZ[indice];
-    arena.TLZ[indice]=*(arena.TLZ[indice]);
+    void* mem_alloue=arena.TZL[indice];
+
+    //
+    uint64_t** tmp_arena=(uint64_t**)(arena.TZL[indice]);
+    uint64_t* tmp_in_arena=*tmp_arena;
+    arena.TZL[indice]=(void*)(tmp_in_arena);
+    //arena.TZL[indice]=*(arena.TZL[indice]);
     return (mem_alloue);
 }
 
 
 
 void efree_medium(Alloc a) {
-    unsigned int indice=puiss2(size);
-    void* adresse_budy=a.ptr^((uint64_t)*pow(2,indice));
-    void* ptr_courant=arena.TLZ[indice];
+    unsigned int indice=puiss2(a.size);
+
+    int pow=1;
+    for(int i=1;i<=indice;i++){
+      pow=pow*2;
+    }
+
+    void* adresse_budy=(void*)(((uint64_t)a.ptr)^((uint64_t)pow));
+    void* ptr_courant=arena.TZL[indice];
     while(1){
       if(ptr_courant==adresse_budy){
-        *(adresse_budy-pow(2,indice))=NULL;
+
+        pow=1;
+        for(int i=1;i<=indice;i++){
+          pow=pow*2;
+        }
+
+        uint64_t** tmp=(uint64_t**)(adresse_budy-pow);
+        *tmp=NULL;
         a.size=2*a.size;
         indice++;
-        adresse_budy=a.ptr^((uint64_t)*pow(2,indice));
-        ptr_courant=arena.TLZ[indice];
+
+        pow=1;
+        for(int i=1;i<=indice;i++){
+          pow=pow*2;
+        }
+
+        adresse_budy=(void*)(((uint64_t)a.ptr)^((uint64_t)pow));
+        ptr_courant=arena.TZL[indice];
       }
       else{
-        ptr_courant=*ptr_courant;
+        uint64_t** tmp=ptr_courant;
+        uint64_t* tmp_in=*tmp;
+        ptr_courant=(void*)tmp_in;
         if(ptr_courant==NULL){
-          *(a.ptr)=arena.TLZ[indice];
-          arena.TLZ[indice]=a.ptr;
+          tmp=a.ptr;
+          tmp_in=arena.TZL[indice];
+          *tmp=tmp_in;
+          //*(a.ptr)=arena.TZL[indice];
+          arena.TZL[indice]=a.ptr;
           break;
         }
       }
