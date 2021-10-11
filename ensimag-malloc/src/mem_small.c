@@ -12,21 +12,22 @@
 void *
 emalloc_small(unsigned long size)
 {
-  assert(size>64*sizeof(uint8_t));
-  uint64_t** ptr_courant;
+  //assert(size<=64*sizeof(uint8_t));
+
   if(arena.chunkpool==NULL){
+    void** ptr_courant;
     unsigned long mem_realloc=mem_realloc_small();
-    int nb_chunk=mem_realloc/96;
-    for(int i=0;i<nb_chunk;i++){
+    int nb_chunk=(int)(mem_realloc/96);
+    for(int i=0;i<nb_chunk-1;i++){
       ptr_courant=arena.chunkpool+i*96*sizeof(uint8_t);
       *ptr_courant=arena.chunkpool+(i+1)*96*sizeof(uint8_t);
     }
-    ptr_courant=arena.chunkpool+nb_chunk*96*sizeof(uint8_t);
+    ptr_courant=arena.chunkpool+(nb_chunk-1)*96*sizeof(uint8_t);
     *ptr_courant=NULL;
 
   }
     void* ptr=arena.chunkpool;
-    arena.chunkpool=arena.chunkpool+96*sizeof(uint8_t);
+    arena.chunkpool=/**arena.chunkpool*/arena.chunkpool+96*sizeof(uint8_t);
     void* mark=mark_memarea_and_get_user_ptr(ptr,CHUNKSIZE,SMALL_KIND);
     return(mark);
 }

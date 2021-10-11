@@ -25,15 +25,18 @@ unsigned int puiss2(unsigned long size) {
 void *
 emalloc_medium(unsigned long size)
 {
-    assert(size < LARGEALLOC);
-    assert(size > SMALLALLOC);
+    // assert(size < LARGEALLOC);
+    // assert(size > SMALLALLOC);
     unsigned int indice=puiss2(size);
     unsigned int courant=indice;
     while((arena.TZL[courant]==NULL) && (courant<TZL_SIZE)){
       courant++;
     }
-    if(courant==TZL_SIZE){
+    if((courant==TZL_SIZE) && (arena.TZL[courant]==NULL)){
       mem_realloc_medium();
+      void* tmp_user=arena.TZL[indice];
+      arena.TZL[indice]=NULL;
+      return(tmp_user);
     }
     while(courant!=indice){
       uint64_t* decoupe1=arena.TZL[courant];
@@ -43,21 +46,21 @@ emalloc_medium(unsigned long size)
         pow=pow*2;
       }
 
-      uint64_t* decoupe2=(uint64_t*)(arena.TZL[courant])+(pow/8);
-      arena.TZL[courant]=(void*)*decoupe1;
+      uint64_t* decoupe2=decoupe1+pow/16;
+      arena.TZL[courant]=(void*)*decoupe2;
       *decoupe1=(uint64_t)decoupe2;
-      *decoupe2=(uint64_t)arena.TZL[courant-1];
+      *decoupe2=(uint64_t)arena.TZL[courant-1];//NULL
       arena.TZL[courant-1]=decoupe1;
       courant--;
     }
-    void* mem_alloue=arena.TZL[indice];
+    //void* mem_alloue=arena.TZL[indice];
 
     //
-    uint64_t** tmp_arena=(uint64_t**)(arena.TZL[indice]);
-    uint64_t* tmp_in_arena=*tmp_arena;
+    void** tmp_arena=(void**)(arena.TZL[indice]);
+    void* tmp_in_arena=*tmp_arena;
     arena.TZL[indice]=(void*)(tmp_in_arena);
     //arena.TZL[indice]=*(arena.TZL[indice]);
-    return (mem_alloue);
+    return ((void*)tmp_arena);
 }
 
 
