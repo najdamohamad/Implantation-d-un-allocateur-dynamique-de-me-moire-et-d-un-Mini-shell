@@ -25,15 +25,30 @@ unsigned int puiss2(unsigned long size) {
 void *
 emalloc_medium(unsigned long size)
 {
+    //arena.TZL[TZL_SIZE]=NULL;
     // assert(size < LARGEALLOC);
     // assert(size > SMALLALLOC);
     unsigned int indice=puiss2(size);
     unsigned int courant=indice;
-    while((arena.TZL[courant]==NULL) && (courant<TZL_SIZE)){
+
+
+
+    while((arena.TZL[courant]==NULL) && (courant<TZL_SIZE-1)){
       courant++;
+
+
+      printf("[%d] = %p\n",courant,arena.TZL[courant]);
+
     }
-    if((courant==TZL_SIZE) && (arena.TZL[courant]==NULL)){
-      mem_realloc_medium();
+    if((courant==TZL_SIZE-1) && (arena.TZL[courant]==NULL)){
+      int size=mem_realloc_medium();
+
+
+      for(int i=0;i<TZL_SIZE;i++){
+        printf("[%d] = %p  // taille realloc: %d\n",i,arena.TZL[i],size);
+      }
+
+
       void* tmp_user=arena.TZL[indice];
       arena.TZL[indice]=NULL;
       return(tmp_user);
@@ -47,7 +62,10 @@ emalloc_medium(unsigned long size)
       }
 
       uint64_t* decoupe2=decoupe1+pow/16;
-      arena.TZL[courant]=(void*)*decoupe2;
+
+      arena.TZL[courant]=(void*)(*decoupe2);
+
+
       *decoupe1=(uint64_t)decoupe2;
       *decoupe2=(uint64_t)arena.TZL[courant-1];//NULL
       arena.TZL[courant-1]=decoupe1;

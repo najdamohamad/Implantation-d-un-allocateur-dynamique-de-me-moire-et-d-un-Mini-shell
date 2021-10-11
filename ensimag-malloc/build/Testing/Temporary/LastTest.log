@@ -1,36 +1,39 @@
-Start testing: Oct 11 16:58 CEST
+Start testing: Oct 11 19:23 CEST
 ----------------------------------------------------------
 1/1 Testing: AllTestsAllocator
 1/1 Test: AllTestsAllocator
 Command: "/home/corentin/Documents/sepc/ensimag-malloc/build/alloctest"
 Directory: /home/corentin/Documents/sepc/ensimag-malloc/build
-"AllTestsAllocator" start time: Oct 11 16:58 CEST
+"AllTestsAllocator" start time: Oct 11 19:23 CEST
 Output:
 ----------------------------------------------------------
 [==========] Running 12 tests from 4 test suites.
 [----------] Global test environment set-up.
 [----------] 1 test from Mark
 [ RUN      ] Mark.mmix
-Magic: 563282528114132898
-Magic: 563282528114132897/home/corentin/Documents/sepc/ensimag-malloc/tests/test_mark.cc:22: Failure
-Expected equality of these values:
-  pmem0
-    Which is: 0x7fff54f5db42
-  & tab[2]
-    Which is: 0x7fff54f5db50
-[  FAILED  ] Mark.mmix (2955 ms)
-[----------] 1 test from Mark (2955 ms total)
+[       OK ] Mark.mmix (0 ms)
+[----------] 1 test from Mark (0 ms total)
 
 [----------] 7 tests from Basic
 [ RUN      ] Basic.zero
 [       OK ] Basic.zero (0 ms)
 [ RUN      ] Basic.onetinysmall
+[       OK ] Basic.onetinysmall (0 ms)
+[ RUN      ] Basic.onelargesmall
+[       OK ] Basic.onelargesmall (0 ms)
+[ RUN      ] Basic.onemedium
+/home/corentin/Documents/sepc/ensimag-malloc/tests/test_generic.cc:41: Failure
+Expected: (ptr) != (nullptr), actual: NULL vs (nullptr)
+[  FAILED  ] Basic.onemedium (0 ms)
+[ RUN      ] Basic.onelarge
+[       OK ] Basic.onelarge (0 ms)
+[ RUN      ] Basic.oneallocloopsmall
 <end of output>
-Test time =   3.11 sec
+Test time =   0.14 sec
 ----------------------------------------------------------
 Test Failed.
-"AllTestsAllocator" end time: Oct 11 16:58 CEST
-"AllTestsAllocator" time elapsed: 00:00:03
+"AllTestsAllocator" end time: Oct 11 19:23 CEST
+"AllTestsAllocator" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-End testing: Oct 11 16:58 CEST
+End testing: Oct 11 19:23 CEST
