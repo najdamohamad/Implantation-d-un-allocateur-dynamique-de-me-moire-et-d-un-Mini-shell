@@ -22,111 +22,123 @@ unsigned int puiss2(unsigned long size) {
 }
 
 
+
+unsigned long two_pow_n(int n){
+  unsigned long pow=1;
+    for(int i=1;i<=n;i++){
+      pow=pow*2;
+    }
+  return pow;
+}
+
 void *
-emalloc_medium(unsigned long size)
-{
-    //arena.TZL[TZL_SIZE]=NULL;
-    // assert(size < LARGEALLOC);
-    // assert(size > SMALLALLOC);
-    unsigned int indice=puiss2(size);
-    unsigned int courant=indice;
+emalloc_medium(unsigned long size){
+  unsigned int indice=puiss2(size);
+  unsigned int courant=indice;
 
+  while((courant<FIRST_ALLOC_MEDIUM_EXPOSANT + arena.medium_next_exponant) && (arena.TZL[courant]==NULL)){  //ou just <= ?
+    courant++;
+  }
 
+  if((courant==FIRST_ALLOC_MEDIUM_EXPOSANT + arena.medium_next_exponant)
+    && (arena.TZL[FIRST_ALLOC_MEDIUM_EXPOSANT + arena.medium_next_exponant]==NULL)){
 
-    while((arena.TZL[courant]==NULL) && (courant<TZL_SIZE-1)){
-      courant++;
+      mem_realloc_medium();
 
+  }
 
-      printf("[%d] = %p\n",courant,arena.TZL[courant]);
+  while(courant!=indice){
+    uint64_t* decoupe1=arena.TZL[courant];
+    uint64_t* decoupe2=decoupe1+(two_pow_n(courant-1))/8;
+    arena.TZL[courant]=(void*)(*decoupe1);
+    arena.TZL[courant-1]=(void*)decoupe1;
+    *decoupe1=(uint64_t)decoupe2;
+    *decoupe2=0;
+    courant--;
+  }
 
-    }
-    if((courant==TZL_SIZE-1) && (arena.TZL[courant]==NULL)){
-      int size=mem_realloc_medium();
+  uint64_t* ptr_user=arena.TZL[courant];
+  arena.TZL[courant]=(void*)(*ptr_user);
 
+  Alloc a;
+  a.size=size;
+  a.ptr=ptr_user;
+  a.kind=MEDIUM_KIND;
 
-      for(int i=0;i<TZL_SIZE;i++){
-        printf("[%d] = %p  // taille realloc: %d\n",i,arena.TZL[i],size);
-      }
-
-
-      void* tmp_user=arena.TZL[indice];
-      arena.TZL[indice]=NULL;
-      return(tmp_user);
-    }
-    while(courant!=indice){
-      uint64_t* decoupe1=arena.TZL[courant];
-
-      int pow=1;
-      for(int i=1;i<=courant-1;i++){
-        pow=pow*2;
-      }
-
-      uint64_t* decoupe2=decoupe1+pow/16;
-
-      arena.TZL[courant]=(void*)(*decoupe2);
-
-
-      *decoupe1=(uint64_t)decoupe2;
-      *decoupe2=(uint64_t)arena.TZL[courant-1];//NULL
-      arena.TZL[courant-1]=decoupe1;
-      courant--;
-    }
-    //void* mem_alloue=arena.TZL[indice];
-
-    //
-    void** tmp_arena=(void**)(arena.TZL[indice]);
-    void* tmp_in_arena=*tmp_arena;
-    arena.TZL[indice]=(void*)(tmp_in_arena);
-    //arena.TZL[indice]=*(arena.TZL[indice]);
-    return ((void*)tmp_arena);
+  return(a.ptr);
 }
 
 
 
+// void efree_medium(Alloc a) {
+//     unsigned int indice=puiss2(a.size);
+//
+//     int pow=1;
+//     for(int i=1;i<=indice;i++){
+//       pow=pow*2;
+//     }
+//
+//     void* adresse_budy=(void*)(((uint64_t)a.ptr)^((uint64_t)pow));
+//     void* ptr_courant=arena.TZL[indice];
+//     while(1){
+//       if(ptr_courant==adresse_budy){
+//
+//         pow=1;
+//         for(int i=1;i<=indice;i++){
+//           pow=pow*2;
+//         }
+//
+//         uint64_t** tmp=(uint64_t**)(adresse_budy-pow);
+//         *tmp=NULL;
+//         a.size=2*a.size;
+//         indice++;
+//
+//         pow=1;
+//         for(int i=1;i<=indice;i++){
+//           pow=pow*2;
+//         }
+//
+//         adresse_budy=(void*)(((uint64_t)a.ptr)^((uint64_t)pow));
+//         ptr_courant=arena.TZL[indice];
+//       }
+//       else{
+//         uint64_t** tmp=ptr_courant;
+//         uint64_t* tmp_in=*tmp;
+//         ptr_courant=(void*)tmp_in;
+//         if(ptr_courant==NULL){
+//           tmp=a.ptr;
+//           tmp_in=arena.TZL[indice];
+//           *tmp=tmp_in;
+//           //*(a.ptr)=arena.TZL[indice];
+//           arena.TZL[indice]=a.ptr;
+//           break;
+//         }
+//       }
+//     }
+//
+// }
+
 void efree_medium(Alloc a) {
-    unsigned int indice=puiss2(a.size);
 
-    int pow=1;
-    for(int i=1;i<=indice;i++){
-      pow=pow*2;
-    }
+  printf("allocation:\n\tsize: %lu\n\tptr: %p",a.size,a.ptr);
+  printf("\tkind: ");
+  if(a.kind==SMALL_KIND){
+    printf("SMALL_KIND\n");
+  }
+  if(a.kind==MEDIUM_KIND){
+    printf("MEDIUM_KIND");
+  }
+  if(a.kind==LARGE_KIND){
+    printf("LARGE_KIND");
+  }
 
-    void* adresse_budy=(void*)(((uint64_t)a.ptr)^((uint64_t)pow));
-    void* ptr_courant=arena.TZL[indice];
-    while(1){
-      if(ptr_courant==adresse_budy){
+  unsigned int indice = two_pow_n(a.size);
 
-        pow=1;
-        for(int i=1;i<=indice;i++){
-          pow=pow*2;
-        }
+  void* adresse_budy=(void*)(((uint64_t)a.ptr)^((uint64_t)(a.size)));
 
-        uint64_t** tmp=(uint64_t**)(adresse_budy-pow);
-        *tmp=NULL;
-        a.size=2*a.size;
-        indice++;
-
-        pow=1;
-        for(int i=1;i<=indice;i++){
-          pow=pow*2;
-        }
-
-        adresse_budy=(void*)(((uint64_t)a.ptr)^((uint64_t)pow));
-        ptr_courant=arena.TZL[indice];
-      }
-      else{
-        uint64_t** tmp=ptr_courant;
-        uint64_t* tmp_in=*tmp;
-        ptr_courant=(void*)tmp_in;
-        if(ptr_courant==NULL){
-          tmp=a.ptr;
-          tmp_in=arena.TZL[indice];
-          *tmp=tmp_in;
-          //*(a.ptr)=arena.TZL[indice];
-          arena.TZL[indice]=a.ptr;
-          break;
-        }
-      }
-    }
-
+  while(arena.TZL[indice]==adresse_budy){
+    arena.TZL[indice]=NULL;
+    indice++;
+  }
+  arena.TZL[indice]=a.ptr;
 }
