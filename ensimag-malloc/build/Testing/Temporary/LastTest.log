@@ -1,10 +1,10 @@
-Start testing: Oct 15 17:11 CEST
+Start testing: Oct 15 20:10 CEST
 ----------------------------------------------------------
 1/1 Testing: AllTestsAllocator
 1/1 Test: AllTestsAllocator
 Command: "/home/corentin/Documents/sepc/ensimag-malloc/build/alloctest"
 Directory: /home/corentin/Documents/sepc/ensimag-malloc/build
-"AllTestsAllocator" start time: Oct 15 17:11 CEST
+"AllTestsAllocator" start time: Oct 15 20:10 CEST
 Output:
 ----------------------------------------------------------
 [==========] Running 12 tests from 4 test suites.
@@ -18,110 +18,28 @@ Output:
 [ RUN      ] Basic.zero
 [       OK ] Basic.zero (0 ms)
 [ RUN      ] Basic.onetinysmall
+PLUS RIEN DANS LA LISTE DES CHUNKS
 [       OK ] Basic.onetinysmall (0 ms)
 [ RUN      ] Basic.onelargesmall
 [       OK ] Basic.onelargesmall (0 ms)
 [ RUN      ] Basic.onemedium
-[8] = (nil)
-[9] = (nil)
-[10] = (nil)
-[11] = (nil)
-[12] = (nil)
-[13] = (nil)
-[14] = (nil)
-[15] = (nil)
-[16] = (nil)
-[17] = (nil)
-[18] = (nil)
-[19] = (nil)
-[20] = (nil)
-[21] = (nil)
-[22] = (nil)
-[23] = (nil)
-[24] = (nil)
-[25] = (nil)
-[26] = (nil)
-[27] = (nil)
-[28] = (nil)
-[29] = (nil)
-[30] = (nil)
-[31] = (nil)
-[32] = (nil)
-[33] = (nil)
-[34] = (nil)
-[35] = (nil)
-[36] = (nil)
-[37] = (nil)
-[38] = (nil)
-[39] = (nil)
-[40] = (nil)
-[41] = (nil)
-[42] = (nil)
-[43] = (nil)
-[44] = (nil)
-[45] = (nil)
-[46] = (nil)
-[47] = (nil)
-[0] = (nil)  // taille realloc: 131072
-[1] = (nil)  // taille realloc: 131072
-[2] = (nil)  // taille realloc: 131072
-[3] = (nil)  // taille realloc: 131072
-[4] = (nil)  // taille realloc: 131072
-[5] = (nil)  // taille realloc: 131072
-[6] = (nil)  // taille realloc: 131072
-[7] = (nil)  // taille realloc: 131072
-[8] = (nil)  // taille realloc: 131072
-[9] = (nil)  // taille realloc: 131072
-[10] = (nil)  // taille realloc: 131072
-[11] = (nil)  // taille realloc: 131072
-[12] = (nil)  // taille realloc: 131072
-[13] = (nil)  // taille realloc: 131072
-[14] = (nil)  // taille realloc: 131072
-[15] = (nil)  // taille realloc: 131072
-[16] = (nil)  // taille realloc: 131072
-[17] = 0x7fd854140000  // taille realloc: 131072
-[18] = (nil)  // taille realloc: 131072
-[19] = (nil)  // taille realloc: 131072
-[20] = (nil)  // taille realloc: 131072
-[21] = (nil)  // taille realloc: 131072
-[22] = (nil)  // taille realloc: 131072
-[23] = (nil)  // taille realloc: 131072
-[24] = (nil)  // taille realloc: 131072
-[25] = (nil)  // taille realloc: 131072
-[26] = (nil)  // taille realloc: 131072
-[27] = (nil)  // taille realloc: 131072
-[28] = (nil)  // taille realloc: 131072
-[29] = (nil)  // taille realloc: 131072
-[30] = (nil)  // taille realloc: 131072
-[31] = (nil)  // taille realloc: 131072
-[32] = (nil)  // taille realloc: 131072
-[33] = (nil)  // taille realloc: 131072
-[34] = (nil)  // taille realloc: 131072
-[35] = (nil)  // taille realloc: 131072
-[36] = (nil)  // taille realloc: 131072
-[37] = (nil)  // taille realloc: 131072
-[38] = (nil)  // taille realloc: 131072
-[39] = (nil)  // taille realloc: 131072
-[40] = (nil)  // taille realloc: 131072
-[41] = (nil)  // taille realloc: 131072
-[42] = (nil)  // taille realloc: 131072
-[43] = (nil)  // taille realloc: 131072
-[44] = (nil)  // taille realloc: 131072
-[45] = (nil)  // taille realloc: 131072
-[46] = (nil)  // taille realloc: 131072
-[47] = (nil)  // taille realloc: 131072
-/home/corentin/Documents/sepc/ensimag-malloc/tests/test_generic.cc:41: Failure
-Expected: (ptr) != (nullptr), actual: NULL vs (nullptr)
-[  FAILED  ] Basic.onemedium (1 ms)
+[       OK ] Basic.onemedium (0 ms)
 [ RUN      ] Basic.onelarge
-[       OK ] Basic.onelarge (0 ms)
+[       OK ] Basic.onelarge (1 ms)
 [ RUN      ] Basic.oneallocloopsmall
+[       OK ] Basic.oneallocloopsmall (0 ms)
+[ RUN      ] Basic.oneallocloopmedium
+[       OK ] Basic.oneallocloopmedium (0 ms)
+[----------] 7 tests from Basic (1 ms total)
+
+[----------] 3 tests from Generic
+[ RUN      ] Generic.loopevenoddsmall
 <end of output>
-Test time =   0.72 sec
+Test time =   0.15 sec
 ----------------------------------------------------------
 Test Failed.
-"AllTestsAllocator" end time: Oct 15 17:11 CEST
+"AllTestsAllocator" end time: Oct 15 20:10 CEST
 "AllTestsAllocator" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-End testing: Oct 15 17:11 CEST
+End testing: Oct 15 20:10 CEST

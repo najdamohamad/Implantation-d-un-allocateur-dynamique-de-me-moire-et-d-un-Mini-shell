@@ -15,8 +15,11 @@ emalloc_small(unsigned long size)
   //assert(size<=64*sizeof(uint8_t));
 
   if(arena.chunkpool==NULL){
+
+    printf("PLUS RIEN DANS LA LISTE DES CHUNKS\n");
+
     void** ptr_courant;
-    unsigned long mem_realloc=mem_realloc_small();
+    uint64_t mem_realloc=(uint64_t)(mem_realloc_small());
     int nb_chunk=(int)(mem_realloc/96);
     for(int i=0;i<nb_chunk-1;i++){
       ptr_courant=arena.chunkpool+i*96*sizeof(uint8_t);
@@ -32,8 +35,9 @@ emalloc_small(unsigned long size)
     return(mark);
 }
 
+
 void efree_small(Alloc a) {
-    uint64_t** precedent=arena.chunkpool;
+    void* precedent=arena.chunkpool;
     arena.chunkpool=a.ptr;
-    *((uint64_t*)a.ptr)=**precedent;
+    *((uint64_t*)a.ptr)=*(uint64_t*)(precedent);
 }

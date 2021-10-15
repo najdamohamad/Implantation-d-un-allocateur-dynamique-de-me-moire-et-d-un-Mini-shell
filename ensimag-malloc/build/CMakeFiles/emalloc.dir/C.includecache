@@ -8,9 +8,23 @@
 
 /home/corentin/Documents/sepc/ensimag-malloc/src/mem.h
 
-/home/corentin/Documents/sepc/ensimag-malloc/src/mem_internals.c
-sys/mman.h
+/home/corentin/Documents/sepc/ensimag-malloc/src/mem_internals.h
+stdio.h
 -
+stdlib.h
+-
+
+/home/corentin/Documents/sepc/ensimag-malloc/src/mem_medium.c
+stdint.h
+-
+assert.h
+-
+mem.h
+/home/corentin/Documents/sepc/ensimag-malloc/src/mem.h
+mem_internals.h
+/home/corentin/Documents/sepc/ensimag-malloc/src/mem_internals.h
+
+/home/corentin/Documents/sepc/ensimag-malloc/src/mem_small.c
 assert.h
 -
 stdint.h
@@ -19,10 +33,4 @@ mem.h
 /home/corentin/Documents/sepc/ensimag-malloc/src/mem.h
 mem_internals.h
 /home/corentin/Documents/sepc/ensimag-malloc/src/mem_internals.h
-
-/home/corentin/Documents/sepc/ensimag-malloc/src/mem_internals.h
-stdio.h
--
-stdlib.h
--
 

@@ -33,6 +33,7 @@ unsigned long two_pow_n(int n){
 
 void *
 emalloc_medium(unsigned long size){
+  size=size+4;
   unsigned int indice=puiss2(size);
   unsigned int courant=indice;
 
@@ -60,77 +61,15 @@ emalloc_medium(unsigned long size){
   uint64_t* ptr_user=arena.TZL[courant];
   arena.TZL[courant]=(void*)(*ptr_user);
 
-  Alloc a;
-  a.size=size;
-  a.ptr=ptr_user;
-  a.kind=MEDIUM_KIND;
+  void* mark=mark_memarea_and_get_user_ptr(ptr_user,size,MEDIUM_KIND);
 
-  return(a.ptr);
+  return(mark);
 }
 
 
 
-// void efree_medium(Alloc a) {
-//     unsigned int indice=puiss2(a.size);
-//
-//     int pow=1;
-//     for(int i=1;i<=indice;i++){
-//       pow=pow*2;
-//     }
-//
-//     void* adresse_budy=(void*)(((uint64_t)a.ptr)^((uint64_t)pow));
-//     void* ptr_courant=arena.TZL[indice];
-//     while(1){
-//       if(ptr_courant==adresse_budy){
-//
-//         pow=1;
-//         for(int i=1;i<=indice;i++){
-//           pow=pow*2;
-//         }
-//
-//         uint64_t** tmp=(uint64_t**)(adresse_budy-pow);
-//         *tmp=NULL;
-//         a.size=2*a.size;
-//         indice++;
-//
-//         pow=1;
-//         for(int i=1;i<=indice;i++){
-//           pow=pow*2;
-//         }
-//
-//         adresse_budy=(void*)(((uint64_t)a.ptr)^((uint64_t)pow));
-//         ptr_courant=arena.TZL[indice];
-//       }
-//       else{
-//         uint64_t** tmp=ptr_courant;
-//         uint64_t* tmp_in=*tmp;
-//         ptr_courant=(void*)tmp_in;
-//         if(ptr_courant==NULL){
-//           tmp=a.ptr;
-//           tmp_in=arena.TZL[indice];
-//           *tmp=tmp_in;
-//           //*(a.ptr)=arena.TZL[indice];
-//           arena.TZL[indice]=a.ptr;
-//           break;
-//         }
-//       }
-//     }
-//
-// }
 
 void efree_medium(Alloc a) {
-
-  printf("allocation:\n\tsize: %lu\n\tptr: %p",a.size,a.ptr);
-  printf("\tkind: ");
-  if(a.kind==SMALL_KIND){
-    printf("SMALL_KIND\n");
-  }
-  if(a.kind==MEDIUM_KIND){
-    printf("MEDIUM_KIND");
-  }
-  if(a.kind==LARGE_KIND){
-    printf("LARGE_KIND");
-  }
 
   unsigned int indice = two_pow_n(a.size);
 

@@ -18,12 +18,12 @@ unsigned long knuth_mmix_one_round(unsigned long in)
 void *mark_memarea_and_get_user_ptr(void *ptr, unsigned long size, MemKind k)
 {
 
-    unsigned long * taille_start =ptr;
-    unsigned long * magique_start=taille_start+1;
+    uint64_t * taille_start =ptr;
+    uint64_t * magique_start=taille_start+1;
     void* user_pointer=magique_start+1;
-    unsigned long * magique_end=user_pointer+(size-4*sizeof(unsigned long));
-    unsigned long * taille_end=magique_end+1;
-    unsigned long magique = knuth_mmix_one_round((unsigned long)ptr);
+    uint64_t * magique_end=user_pointer+(size-4*sizeof(uint64_t));
+    uint64_t * taille_end=magique_end+1;
+    uint64_t magique = (uint64_t)(knuth_mmix_one_round((unsigned long)ptr));
 
     switch(k){
         case SMALL_KIND:
@@ -52,16 +52,14 @@ mark_check_and_get_alloc(void *ptr)
 {
     Alloc a = {};
 
-    unsigned long* magique_start = ptr-sizeof(unsigned long);
-    unsigned long* taille_start = magique_start-1;
-    unsigned long magique= *magique_start;
-    unsigned long taille= *taille_start;
+    uint64_t* magique_start = ptr-sizeof(uint64_t);
+    uint64_t* taille_start = magique_start-1;
+    uint64_t magique= *magique_start;
+    uint64_t taille= *taille_start;
 
     int mask = 0b11;
     int type = magique & mask;
     MemKind kind;
-
-    printf("magique: %lu\ntype:   %x\n",magique,type);
 
 
     switch(type){
@@ -76,7 +74,7 @@ mark_check_and_get_alloc(void *ptr)
             break;
     }
 
-kind=MEDIUM_KIND; //attention
+//kind=MEDIUM_KIND; //attention
 
     a.ptr=(void *) taille_start;
     a.kind=kind;
