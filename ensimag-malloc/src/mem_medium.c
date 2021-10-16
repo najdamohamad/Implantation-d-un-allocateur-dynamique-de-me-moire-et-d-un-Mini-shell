@@ -81,3 +81,41 @@ void efree_medium(Alloc a) {
   }
   arena.TZL[indice]=a.ptr;
 }
+
+void efree_medium(Alloc a) {
+  unsigned int indice = two_pow_n(a.size);
+
+  if(arena.TZL[indice]==NULL){
+    arena.TZL[indice]=a.ptr;
+    *(arena.TZL[indice])==NULL;
+  }
+
+  else{
+    uint64_t* ptr_chunk;
+    uint64_t* ptr_prec_chunk;
+    while(1){
+      ptr_chunk=arena.TZL[indice];
+      while(ptr_chunk!=(uint64_t*)(((uint64_t)a.ptr)^((uint64_t)(a.size))) && ptr_chunk!=NULL){
+        ptr_prec_chunk=ptr_chunk;
+        ptr_chunk=(uint64_t*)(*ptr_chunk);
+      }
+
+      if(ptr_chunk==NULL){
+        void* tmp=arena.TZL[indice];
+        arena.TZL[indice]=a.ptr;
+        *(arena.TZL[indice])==tmp;
+        break;
+      }
+      else{
+        *ptr_prec_chunk=*ptr_chunk;
+        if(((uint64_t)a.ptr)>((uint64_t)ptr_chunk){
+          a.ptr=ptr_chunk;
+        }
+        a.size=2*a.size;
+      }
+      indice++;
+    }
+
+  }
+
+}
