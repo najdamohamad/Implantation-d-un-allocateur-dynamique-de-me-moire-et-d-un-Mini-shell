@@ -69,25 +69,14 @@ emalloc_medium(unsigned long size){
 
 
 
-// void efree_medium(Alloc a) {
-//
-//   unsigned int indice = two_pow_n(a.size);
-//
-//   void* adresse_budy=(void*)(((uint64_t)a.ptr)^((uint64_t)(a.size)));
-//
-//   while(arena.TZL[indice]==adresse_budy){
-//     arena.TZL[indice]=NULL;
-//     indice++;
-//   }
-//   arena.TZL[indice]=a.ptr;
-// }
-
 void efree_medium(Alloc a) {
+
   unsigned int indice = two_pow_n(a.size);
 
   if(arena.TZL[indice]==NULL){
     arena.TZL[indice]=a.ptr;
-    *(arena.TZL[indice])==NULL;
+    uint64_t** tmp=a.ptr;
+    *tmp= NULL;
   }
 
   else{
@@ -101,14 +90,18 @@ void efree_medium(Alloc a) {
       }
 
       if(ptr_chunk==NULL){
-        void* tmp=arena.TZL[indice];
+
+        uint64_t** tmp1=arena.TZL[indice];
+        uint64_t** tmp2=a.ptr;
+
         arena.TZL[indice]=a.ptr;
-        *(arena.TZL[indice])==tmp;
+        *tmp2=(uint64_t*)tmp1;
+
         break;
       }
       else{
         *ptr_prec_chunk=*ptr_chunk;
-        if(((uint64_t)a.ptr)>((uint64_t)ptr_chunk){
+        if(((uint64_t)a.ptr)>((uint64_t)ptr_chunk)){
           a.ptr=ptr_chunk;
         }
         a.size=2*a.size;
