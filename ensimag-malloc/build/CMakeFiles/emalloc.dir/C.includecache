@@ -24,13 +24,3 @@ mem.h
 mem_internals.h
 /home/corentin/Documents/sepc/ensimag-malloc/src/mem_internals.h
 
-/home/corentin/Documents/sepc/ensimag-malloc/src/mem_small.c
-assert.h
--
-stdint.h
--
-mem.h
-/home/corentin/Documents/sepc/ensimag-malloc/src/mem.h
-mem_internals.h
-/home/corentin/Documents/sepc/ensimag-malloc/src/mem_internals.h
-
