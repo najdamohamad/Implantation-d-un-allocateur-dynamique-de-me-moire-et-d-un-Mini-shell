@@ -18,50 +18,65 @@ unsigned long knuth_mmix_one_round(unsigned long in)
 void *mark_memarea_and_get_user_ptr(void *ptr, unsigned long size, MemKind k)
 {
 
+    //creation des pointeurs sur les differents segments de la zone a marquer
     uint64_t * taille_start =ptr;
-    uint64_t * magique_start=taille_start+1;
+    uint64_t * magique_start=taille_start+1; /*+1 ->  8octets car taille_start est un uint64_t* */
     void* user_pointer=magique_start+1;
-    uint64_t * magique_end=user_pointer+(size-4*sizeof(uint64_t));
+    uint64_t * magique_end=user_pointer+size-4*8; /*+1 -> 1octet car user_pointer est un void* */
     uint64_t * taille_end=magique_end+1;
     uint64_t magique = (uint64_t)(knuth_mmix_one_round((unsigned long)ptr));
 
+    //disjonction de cas en fonction du memkind pour marquer les deux derniers bits du magique
     switch(k){
         case SMALL_KIND:
-            //set last two bits to 00
+            //deux derniers bits a 00
             magique &= ~(1UL);magique &= ~(1UL<<1);
             break;
         case MEDIUM_KIND:
-            //set last two bits to 01
+            //deux derniers bits a 01
             magique |= (1UL);magique &= ~(1UL<<1);
             break;
         case LARGE_KIND:
-            //set last two bits to 10
+            //deux derniers bits a 10
             magique &= ~(1UL);magique |= (1UL<<1);
             break;
     }
 
+    //marquage de la zone aux adresses calculees
     *magique_start = magique;
     *magique_end =  magique;
     *taille_start =  size;
     *taille_end =  size;
+
     return user_pointer;
 }
 
 Alloc
 mark_check_and_get_alloc(void *ptr)
 {
+
     Alloc a = {};
 
-    uint64_t* magique_start = ptr-sizeof(uint64_t);
-    uint64_t* taille_start = magique_start-1;
-    uint64_t magique= *magique_start;
+    //recuperation de l'adresse du 1er magique et de sa valeur
+    uint64_t* magique_start = ptr-8;
+    uint64_t magique1= *magique_start;
+
+    //recuperation de l'adresse de la taille et de sa valeur
+    uint64_t* taille_start = ptr-16;
     uint64_t taille= *taille_start;
 
+    //recuperation de l'adresse du 2eme magique et de sa valeur
+    
+    // uint64_t* magique_end = ptr + taille - 32;
+    // uint64_t magique2=*magique_end;
+    //assert(magique1==magique2);
+
+    //application d'un masque à magique pour recuperer uniquement la valeur des deux derniers bits
     int mask = 0b11;
-    int type = magique & mask;
+    int type = magique1 & mask;
     MemKind kind;
 
-
+    //disjonction des cas en fonction des deuc derniers bits de magique calcules precedement
     switch(type){
         case 0:
             kind=SMALL_KIND;
@@ -73,8 +88,6 @@ mark_check_and_get_alloc(void *ptr)
             kind=LARGE_KIND;
             break;
     }
-
-//kind=MEDIUM_KIND; //attention
 
     a.ptr=(void *) taille_start;
     a.kind=kind;
