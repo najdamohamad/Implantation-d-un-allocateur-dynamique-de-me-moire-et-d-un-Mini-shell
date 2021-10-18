@@ -18,15 +18,15 @@ TEST(Medium,buddy) {
   memset(mref, 1, ALLOC_MEM_SIZE);
   efree(mref);
   ASSERT_NE( nb_TZL_entries(), 1U);
-  
+
   void *mref2 = emalloc(ALLOC_MEM_SIZE); // again, should give same address
   ASSERT_NE( mref2, (void*) 0);
   ASSERT_EQ( mref2, mref ); // both allocation should give same address
   efree(mref2);
-  ASSERT_NE( nb_TZL_entries(), 1U);  
+  ASSERT_NE( nb_TZL_entries(), 1U);
 
-  // Next two allocations should be buddys of 128 Bytes 
-  void *m1 = emalloc(65); 
+  // Next two allocations should be buddys of 128 Bytes
+  void *m1 = emalloc(65);
   ASSERT_NE( m1, (void *)0 );
   memset( m1, 1, 65);
 
@@ -41,7 +41,7 @@ TEST(Medium,buddy) {
 
   efree(m1);
   efree(m2);
-  ASSERT_NE( nb_TZL_entries(), 1U);  
+  ASSERT_NE( nb_TZL_entries(), 1U);
 
   // after fusion, the merge allow to get back the same full block
   void *mref3 = emalloc(ALLOC_MEM_SIZE);
