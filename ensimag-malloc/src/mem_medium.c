@@ -125,9 +125,13 @@ void efree_medium(Alloc a) {
       else{
         *ptr_prec_chunk=*ptr_chunk;
         if(((uint64_t)a.ptr)>((uint64_t)ptr_chunk)){
-          a.ptr=ptr_chunk;
+          a=mark_check_and_get_alloc(mark_memarea_and_get_user_ptr(ptr_chunk,2*a.size,MEDIUM_KIND));
+          //a.ptr=ptr_chunk;
         }
-        a.size=2*a.size;
+        else{
+          a=mark_check_and_get_alloc(mark_memarea_and_get_user_ptr(a.ptr,2*a.size,MEDIUM_KIND));
+        }
+        //a.size=2*a.size;
       }
       indice++;
     }

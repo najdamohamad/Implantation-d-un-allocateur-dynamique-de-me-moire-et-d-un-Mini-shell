@@ -26,6 +26,7 @@ emalloc_small(unsigned long size)
     //linkage des differents chunks de la liste
     for(int i=0;i<nb_chunk-1;i++){
       ptr_courant=arena.chunkpool+i*96;
+      printf("ptr : %p\n",ptr_courant);
       *ptr_courant=arena.chunkpool+(i+1)*96;
     }
     ptr_courant=arena.chunkpool+(nb_chunk-1)*96;
@@ -35,7 +36,7 @@ emalloc_small(unsigned long size)
   //cas courant (liste de chunk non vide): on prend le retourne le premier chunk de la liste
   //apres l'avoir marque et on lie le chunkpool aux 2eme chunk de la liste
     void* ptr=arena.chunkpool;
-    arena.chunkpool=arena.chunkpool+96  ;
+    arena.chunkpool=arena.chunkpool+96 ;
     void* mark=mark_memarea_and_get_user_ptr(ptr,CHUNKSIZE,SMALL_KIND);
     return(mark);
 }
