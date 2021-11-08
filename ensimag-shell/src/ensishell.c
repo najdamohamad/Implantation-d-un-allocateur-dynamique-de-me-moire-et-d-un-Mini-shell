@@ -85,6 +85,55 @@ int main() {
 		   can not be cleaned at the end of the program. Thus
 		   one memory leak per command seems unavoidable yet */
 
+
+		//char argument_list[100];
+		//char **cmd = l->seq[0];
+		line = readline(prompt);
+		printf("%s\n\n\n",line);
+
+		if (line == 0 || ! strncmp(line,"exit", 4)) {
+			terminate(line);
+		}
+
+		else{			
+
+
+		pid_t pid ;
+		switch (pid = fork()){
+		case -1 :
+			perror("fork:") ;
+			break ;
+		case 0 :
+			l = parsecmd(&line) ;
+			char **cd = l->seq[0];
+			/*for(j=0; cd[j]!=0; j++)
+			{
+				printf("\n\n%s\n\n",cd[j]);
+
+			}*/
+			//char *argv[3] = { "/bin/ls", "-l" , NULL } ;
+			//char command[50] = *l->seq[0];
+			char path[200] = "/bin/" ;
+			strcat(path,*l->seq[0]);
+			execv(path, cd);
+			//printf("\n\n%s\n\n",*l->seq[1]);
+			break;
+		default :
+		{
+			int status ;
+			waitpid(pid,&status,0);
+			printf("%d , je suis ton pere \n", pid);
+			
+			break;
+		}
+
+
+		}
+		}
+		/*
+
+
+
 		if (line == 0 || ! strncmp(line,"exit", 4)) {
 			terminate(line);
 		}
@@ -133,10 +182,15 @@ int main() {
 				fprintf (stderr, "une erreur est survenue au sein de execvp\n");
 			}
 			else{
+				int wstatus ;
+
 				printf("J'attend mon fils\n");
+				waitpid;
 
 			}
 		}
+
+		*/
 
 
 #if USE_GNU_READLINE == 1
