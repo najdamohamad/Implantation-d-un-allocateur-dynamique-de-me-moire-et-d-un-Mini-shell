@@ -1,18 +1,12 @@
-/*****************************************************
- * Copyright Grégory Mounié 2008-2015                *
- *           Simon Nieuviarts 2002-2009              *
- * This code is distributed under the GLPv3 licence. *
- * Ce code est distribué sous la licence GPLv3+.     *
- *****************************************************/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <wait.h>
-#include <sys/types.h>
-#include <fcntl.h>
-#include <sys/stat.h>
+#include <stdbool.h>
 #include <unistd.h>
+#include <sys/wait.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <fcntl.h>
 
 #include "variante.h"
 #include "readcmd.h"
@@ -20,6 +14,141 @@
 #ifndef VARIANTE
 #error "Variante non défini !!"
 #endif
+
+//gestion des jobs
+
+typedef struct _list_of_jobs{
+	pid_t pid;
+	char* cmd;
+	struct _list_of_jobs* next;
+} *list_of_jobs;
+
+list_of_jobs list = NULL;
+
+list_of_jobs last_list_of_jobs() {
+    if (list == NULL) {
+        list = malloc(sizeof(list_of_jobs));
+        list->next = NULL;
+        return list;
+    }
+
+    list_of_jobs courant = list;
+
+    while(courant->next != NULL) {
+        courant = courant->next;
+    }
+
+    courant->next = malloc(sizeof(list_of_jobs));
+    courant->next->next = NULL;
+
+    return courant->next;
+}
+
+void gestion_des_jobs(list_of_jobs list){
+	printf("liste des jobs \n");
+
+	list_of_jobs courant = list;
+	list_of_jobs ancien = NULL;
+
+	while(courant != NULL) {
+			int status;
+
+			/* If the process is running */
+			if(((bool) waitpid(courant->pid, &status, WNOHANG))==false) {
+					printf("%d : %s\n", courant->pid, courant->cmd);
+			} else {
+					if(ancien == NULL) {
+							list = courant->next;
+					} else {
+							ancien->next = courant->next;
+					}
+			}
+
+			ancien = courant;
+			courant = courant->next;
+	}
+}
+
+//traitement de la commande
+int tuyau[2];
+
+void traiter_cmd(struct cmdline* ptr_l,char** cmd,int i){
+	pid_t pid;
+	int status;
+
+	if(l->seq[1] != NULL{
+		pipe(tuyau);
+	}
+
+	switch(pid=fork()){
+
+		case -1:
+			perror("fork:") ;
+			break ;
+
+		case 0:
+
+			if(i>0) {
+					dup2(tuyau[1],1);
+			}
+			if(ptr_l->seq[i+1]!=NULL) {
+					dup2(tuyau[0],0);
+			}
+
+			int file;
+
+			if((ptr_l->in!=NULL) && (i==0)){
+				if ((file = open(ptr_l->in, O_RDONLY)) < 0) {
+						printf("erreur: ouverture impossible %s\n", ptr_l->in);
+				}
+				dup2(file, STDIN_FILENO);
+				close(file);
+			}
+			if((ptr_l->out!=NULL) && (i==0)){
+				if ((file = open(ptr_l->out, O_WRONLY|O_TRUNC|O_CREAT,0666)) < 0) {
+						printf("erreur: ouverture impossible %s\n", ptr_l->out);
+				}
+
+				dup2(file, STDOUT_FILENO);
+				close(file);
+			}
+			if ((ptr_l->in != NULL) && (ptr_l->seq[i+1] != 0)) {
+					if ((file = open(ptr_l->in, O_RDONLY)) < 0) {
+							printf("erreur: ouverture impossible %s\n", ptr_l->in);
+					}
+
+					dup2(file, STDIN_FILENO);
+					close(file);
+			}
+			if ((ptr_l->out != NULL) && (i>0)) {
+					if ((file = open(ptr_l->out, O_WRONLY|O_TRUNC|O_CREAT,0666)) < 0) {
+							printf("erreur: ouverture impossible %s\n", ptr_l->out);
+					}
+
+					dup2(file, STDOUT_FILENO);
+					close(file);
+			}
+
+
+			close(tuyau[1]);
+			execvp(cmd[0],cmd);
+			break;
+
+		default:
+			if(!ptr_l->bg){
+				waitpid(pid,&status,0);
+				break;
+			}
+			else{
+				list_of_jobs last = last_list_of_jobs();
+				last->pid = pid;
+				last->cmd = malloc(strlen(cmd[0]) * sizeof(char));
+				strcpy(last->cmd, cmd[0]);
+				break;
+			}
+	}
+}
+
 
 /* Guile (1.8 and 2.0) is auto-detected by cmake */
 /* To disable Scheme interpreter (Guile support), comment the
@@ -30,8 +159,6 @@
 #if USE_GUILE == 1
 #include <libguile.h>
 
-
-
 int question6_executer(char *line)
 {
 	/* Question 6: Insert your code to execute the command line
@@ -41,7 +168,7 @@ int question6_executer(char *line)
 	 */
 	printf("Not implemented yet: can not execute %s\n", line);
 
-	/* Remove this line when using as it will free it */
+	/* Remove this line when using parsecmd as it will free it */
 	free(line);
 
 	return 0;
@@ -84,114 +211,10 @@ int main() {
 		/* Readline use some internal memory structure that
 		   can not be cleaned at the end of the program. Thus
 		   one memory leak per command seems unavoidable yet */
-
-
-		//char argument_list[100];
-		//char **cmd = l->seq[0];
 		line = readline(prompt);
-		printf("%s\n\n\n",line);
-
 		if (line == 0 || ! strncmp(line,"exit", 4)) {
 			terminate(line);
 		}
-
-		else{			
-
-
-		pid_t pid ;
-		switch (pid = fork()){
-		case -1 :
-			perror("fork:") ;
-			break ;
-		case 0 :
-			l = parsecmd(&line) ;
-			char **cd = l->seq[0];
-			/*for(j=0; cd[j]!=0; j++)
-			{
-				printf("\n\n%s\n\n",cd[j]);
-
-			}*/
-			//char *argv[3] = { "/bin/ls", "-l" , NULL } ;
-			//char command[50] = *l->seq[0];
-			char path[200] = "/bin/" ;
-			strcat(path,*l->seq[0]);
-			execv(path, cd);
-			//printf("\n\n%s\n\n",*l->seq[1]);
-			break;
-		default :
-		{
-			int status ;
-			waitpid(pid,&status,0);
-			printf("%d , je suis ton pere \n", pid);
-			
-			break;
-		}
-
-
-		}
-		}
-		/*
-
-
-
-		if (line == 0 || ! strncmp(line,"exit", 4)) {
-			terminate(line);
-		}
-
-		else{
-
-			strcat(line,"\0");
-
-			pid_t pid;
-			pid=fork();
-
-			if(pid==0){
-
-				const char* separateurs = " ";
-				char* comm="/bin/";
-
-				char* tmp=malloc(100*sizeof(char));
-				char* opt=malloc(100*sizeof(char));
-
-				char* strtoken = strtok(line,separateurs);
-				tmp=strtoken;
-				strcat(comm,tmp);
-				printf("COMM ICI: %s",comm);
-				strtoken=strtok(NULL,separateurs);
-
-				while(strtoken!=NULL){
-					strcat(opt,strtoken);
-					strcat(opt," ");
-					strtok(NULL,separateurs);
-				}
-
-				printf("\nline:  %s",line);
-				printf("\ncomm:  %s",comm);
-				printf("\nopt:   %s",opt);getchar();getchar();
-
-	      char *argv[3] = { comm, opt , NULL } ;
-	      char *envp[1] = { NULL };
-
-				// char *argv[3] = { "/bin/ls", "-l" , NULL } ;
-	      // char *envp[1] = { NULL };
-
-				execve(comm, argv, envp);
-
-				//execve("/bin/ls", argv, envp);
-
-				fprintf (stderr, "une erreur est survenue au sein de execvp\n");
-			}
-			else{
-				int wstatus ;
-
-				printf("J'attend mon fils\n");
-				waitpid;
-
-			}
-		}
-
-		*/
-
 
 #if USE_GNU_READLINE == 1
 		add_history(line);
@@ -231,13 +254,23 @@ int main() {
 		if (l->bg) printf("background (&)\n");
 
 		/* Display each command of the pipe */
+
 		for (i=0; l->seq[i]!=0; i++) {
 			char **cmd = l->seq[i];
 			printf("seq[%d]: ", i);
-      for (j=0; cmd[j]!=0; j++) {
-          printf("'%s' ", cmd[j]);
-      }
+                        for (j=0; cmd[j]!=0; j++) {
+                                printf("'%s' ", cmd[j]);
+                        }
 			printf("\n");
+
+			if(!strcmp(cmd[0],"jobs")){
+				gestion_des_jobs(list);
+			}
+			else{
+				traiter_cmd(l,cmd,i);
+			}
+
+
 		}
 	}
 
